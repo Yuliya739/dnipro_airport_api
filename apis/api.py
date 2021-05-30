@@ -1,8 +1,10 @@
 from flask import Flask
-# import sqlalchemy
+from flask.wrappers import Request
+from flask import Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from flask import jsonify
+from flask import request
 import sqlalchemy
 from sqlalchemy.sql.schema import MetaData, Table
 from sqlalchemy.sql.sqltypes import String
@@ -43,14 +45,6 @@ def __init__(self, last_name, first_name, patronymic, password):
 
 db.create_all()
 
-@app.route('/')
-def hello():
-    return 'Hello, World!'
-
-@app.route('/admin/keys')
-def admin_keys():
-    return jsonify(admin.columns.keys())
-
 @app.route('/admin')
 def admins():
     data = admin.query.all()
@@ -65,3 +59,10 @@ def insertdata():
     connection.execute(sql_row, data)
 
     return "ok"
+
+@app.route('/test', methods=['POST'])
+def test():
+    if(request.method == 'POST'):
+        return Response("test", status=201, mimetype='application/json')
+    else:
+        return 'Not found', 404
