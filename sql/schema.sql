@@ -1,4 +1,6 @@
+DROP DATABASE IF EXISTS dneprairport;
 CREATE DATABASE dneprairport;
+\c dneprairport
 
 CREATE TABLE admin(
   admin_id text PRIMARY KEY NOT NULL,
