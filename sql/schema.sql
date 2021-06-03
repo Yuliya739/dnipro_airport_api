@@ -23,14 +23,7 @@ CREATE TABLE orders(
   date_of_birthday date NOT NULL,
   num_passport bigint NOT NULL,
   valid_until date NOT NULL,
-  num_phone bigint NOT NULL
-);
-
-CREATE TABLE ticket(
-  ticket_id text PRIMARY KEY NOT NULL,
-  air_ticket_class text NOT NULL,
-  order_id text,
-  FOREIGN KEY(order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+  email text NOT NULL
 );
 
 CREATE TABLE transplantation(
@@ -67,13 +60,20 @@ CREATE TABLE flight(
   arrival_id text NOT NULL,
   departure_id text NOT NULL,
   transplantation_id text NOT NULL,
-  ticket_id text NOT NULL,
   FOREIGN KEY(arrival_id) REFERENCES arrival_flight(arrival_id) ON DELETE CASCADE,
   UNIQUE(arrival_id),
   FOREIGN KEY(departure_id) REFERENCES departure_flight(departure_id) ON DELETE CASCADE,
   UNIQUE(departure_id),
-  FOREIGN KEY(transplantation_id) REFERENCES transplantation(transplantation_id) ON DELETE CASCADE,
-  FOREIGN KEY(ticket_id) REFERENCES ticket(ticket_id)
+  FOREIGN KEY(transplantation_id) REFERENCES transplantation(transplantation_id) ON DELETE CASCADE
+);
+
+CREATE TABLE ticket(
+  ticket_id text PRIMARY KEY NOT NULL,
+  air_ticket_class text NOT NULL,
+  order_id text,
+  flight_id text NOT NULL, 
+  FOREIGN KEY(order_id) REFERENCES orders(order_id) ON DELETE CASCADE, 
+  FOREIGN KEY(flight_id) REFERENCES flight(flight_id) ON DELETE CASCADE
 );
 
 CREATE TABLE airline(
@@ -86,7 +86,7 @@ CREATE TABLE airline(
   icao text NOT NULL,
   carriage_class text NOT NULL,
   call_center text NOT NULL,
-  admin_id text NOT NULL,
+  admin_id text,
   flight_id text NOT NULL,
   plane_id text NOT NULL,
   FOREIGN KEY(admin_id) REFERENCES admin(admin_id),
