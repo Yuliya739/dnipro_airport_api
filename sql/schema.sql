@@ -33,37 +33,18 @@ CREATE TABLE transplantation(
   company_transfer text NOT NULL
 );
 
-CREATE TABLE arrival_flight(
-  arrival_id text PRIMARY KEY NOT NULL,
-  direction text NOT NULL,
-  arrival_date timestamp with time zone NOT NULL,
-  terminal text NOT NULL,
-  gate text NOT NULL,
-  remark text NOT NULL,
-  airport_name text NOT NULL
-);
-
-CREATE TABLE departure_flight(
-  departure_id text PRIMARY KEY NOT NULL,
+CREATE TABLE flight(
+  flight_id text PRIMARY KEY NOT NULL,
+  estimated_time timestamp with time zone NOT NULL,
+  airline_name text NOT NULL,
+  transplantation_id text,
+  is_departure boolean DEFAULT TRUE NOT NULL,
   real_time timestamp with time zone NOT NULL,
   terminal text NOT NULL,
   gate text NOT NULL,
   remark text NOT NULL,
-  airport_name text NOT NULL
-);
-
-CREATE TABLE flight(
-  flight_id text PRIMARY KEY NOT NULL,
+  airport_name text NOT NULL,
   direction text NOT NULL,
-  departure_date timestamp with time zone NOT NULL,
-  airline_name text NOT NULL,
-  arrival_id text NOT NULL,
-  departure_id text NOT NULL,
-  transplantation_id text NOT NULL,
-  FOREIGN KEY(arrival_id) REFERENCES arrival_flight(arrival_id) ON DELETE CASCADE,
-  UNIQUE(arrival_id),
-  FOREIGN KEY(departure_id) REFERENCES departure_flight(departure_id) ON DELETE CASCADE,
-  UNIQUE(departure_id),
   FOREIGN KEY(transplantation_id) REFERENCES transplantation(transplantation_id) ON DELETE CASCADE
 );
 
