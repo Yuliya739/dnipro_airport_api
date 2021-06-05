@@ -62,14 +62,18 @@ class Transplantation(Base, CustomSerializerMixin):
         self.company_transfer = company_transfer
         self.flight_id = flight_id
 
-def flight_id_generator():
-    return ''.join(random.choices(string.ascii_uppercase, k=2)) + ' ' +\
-        ''.join(random.choices(string.digits, k=4))
+def flight_id_generator() -> str:
+    firLetters = bytes(range(b'a'[0], b'z'[0]+1)).decode()
+    firSymbols = list(firLetters.upper())
+    first = str.join('', (random.choice(firSymbols) for _ in range(2)))
+    secSymbols = list(bytes(range(b'0'[0], b'9'[0]+1)).decode())
+    second = str.join('', (random.choice(secSymbols) for _ in range(4)))
+    return first + ' ' + second
 
 class Flight(Base, CustomSerializerMixin):
     __tablename__ = 'flight'
 
-    flight_id = Column(String(), nullable=False, primary_key = True, name = 'flight_id',  default=flight_id_generator())
+    flight_id = Column(String(), nullable=False, primary_key = True, name = 'flight_id',  default=flight_id_generator)
     estimated_time = Column(DateTime(timezone=True), nullable=False)
     is_departure = Column(Boolean(), nullable=False, default=True)
     real_time = Column(DateTime(timezone=True), nullable=False)
@@ -113,7 +117,7 @@ class Tiket(Base, CustomSerializerMixin):
 class Airline(Base, CustomSerializerMixin):
     __tablename__ = 'airline'
 
-    airline_id = Column(String(), nullable=False, primary_key = True, name = 'ticket_id', default=lambda: str(uuid.uuid4()))
+    airline_id = Column(String(), nullable=False, primary_key = True, name = 'airline_id', default=lambda: str(uuid.uuid4()))
     airline_name = Column(String(), nullable=False)
     country = Column(String(), nullable=False)
     iso31661_alpha2 = Column(String(), nullable=False)
