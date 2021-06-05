@@ -12,17 +12,15 @@ CREATE TABLE airline(
   iata text NOT NULL,
   icao text NOT NULL,
   carriage_class text NOT NULL,
-  call_center text NOT NULL,
-  flight_id text NOT NULL,
-  plane_id text NOT NULL,
-  FOREIGN KEY(flight_id) REFERENCES flight(flight_id),
-  FOREIGN KEY(plane_id) REFERENCES plane(plane_id) ON DELETE CASCADE
+  call_center text NOT NULL
 );
 
 CREATE TABLE plane(
   plane_id text PRIMARY KEY NOT NULL,
   plane_name text NOT NULL,
-  kol_seats bigint NOT NULL
+  kol_seats bigint NOT NULL,
+  airline_id text NOT NULL,
+  FOREIGN KEY(airline_id) REFERENCES airline(airline_id)
 );
 
 CREATE TABLE orders(
@@ -38,14 +36,15 @@ CREATE TABLE orders(
 CREATE TABLE flight(
   flight_id text PRIMARY KEY NOT NULL,
   estimated_time timestamp with time zone NOT NULL,
-  airline_name text NOT NULL,
   is_departure boolean DEFAULT TRUE NOT NULL,
   real_time timestamp with time zone NOT NULL,
   terminal text NOT NULL,
   gate text NOT NULL,
   remark text NOT NULL,
   airport_name text NOT NULL,
-  direction text NOT NULL
+  direction text NOT NULL,
+  airline_id text NOT NULL,
+  FOREIGN KEY(airline_id) REFERENCES airline(airline_id) ON DELETE CASCADE
 );
 
 CREATE TABLE transplantation(

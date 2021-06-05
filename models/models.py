@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, SmallInteger, Boolean, CheckConstraint, ForeignKey, DateTime, Index
+from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime
 import string    
 import random
 from sqlalchemy.sql.sqltypes import Date, Integer
@@ -13,13 +13,16 @@ class Plane(Base, CustomSerializerMixin):
 
     plane_id = Column(String(), nullable=False, primary_key = True, name = 'plane_id', default=lambda: str(uuid.uuid4()))
     plane_name = Column(String(), nullable=False)
-    kol_seats = Column(String(), nullable=False) 
+    kol_seats = Column(String(), nullable=False)
+    airline_id = Column(String(), ForeignKey('airline.airline_id'), nullable=False)
 
-    def __init__(self, plane_name, kol_seats, plane_id = None):
+
+    def __init__(self, plane_name, kol_seats, airline_id, plane_id = None):
         if plane_id:
             self.plane_id = plane_id
         self.plane_name = plane_name
         self.kol_seats = kol_seats
+        self.airline_id = airline_id
 
 class Orders(Base, CustomSerializerMixin):
     __tablename__ = 'orders'
@@ -68,21 +71,21 @@ class Flight(Base, CustomSerializerMixin):
 
     flight_id = Column(String(), nullable=False, primary_key = True, name = 'flight_id',  default=flight_id_generator())
     estimated_time = Column(DateTime(timezone=True), nullable=False)
-    airline_name = Column(String(), nullable=False)
     is_departure = Column(Boolean(), nullable=False, default=True)
     real_time = Column(DateTime(timezone=True), nullable=False)
     terminal = Column(String(), nullable=False)
     gate = Column(String(), nullable=False)
     remark = Column(String(), nullable=False)
     airport_name = Column(String(), nullable=False)
-    direction = Column(String(), nullable=False)
+    direction = Column(String(), nullable=False)    
+    airline_id = Column(String(), ForeignKey('airline.airline_id', ondelete='CASCADE'), nullable=False)
 
-    def __init__(self, is_departure, estimated_time, airline_name, arrival_id, departure_id,\
-         direction, arrival_date, terminal, gate, remark, airport_name, flight_id = None):
+
+    def __init__(self, is_departure, estimated_time, arrival_id, departure_id,\
+         direction, arrival_date, terminal, airline_id, gate, remark, airport_name, flight_id = None):
         if flight_id:
             self.flight_id = flight_id    
         self.estimated_time = estimated_time
-        self.airline_name = airline_name
         self.arrival_id = arrival_id        
         self.departure_id = departure_id        
         self.is_departure = is_departure
@@ -91,7 +94,8 @@ class Flight(Base, CustomSerializerMixin):
         self.gate = gate
         self.remark = remark        
         self.airport_name = airport_name
-        self.direction = direction   
+        self.direction = direction  
+        self.airline_id = airline_id 
 
 class Tiket(Base, CustomSerializerMixin):
     __tablename__ = 'ticket'
@@ -120,10 +124,8 @@ class Airline(Base, CustomSerializerMixin):
     icao = Column(String(), nullable=False)
     carriage_class = Column(String(), nullable=False)
     call_center = Column(String(), nullable=False)
-    flight_id = Column(String(), ForeignKey('flight.flight_id'), nullable=False)
-    plane_id = Column(String(), ForeignKey('plane.plane_id', ondelete='CASCADE'), nullable=False)
 
-    def __init__(self, airline_name, country, iso31661_alpha2, iso31661_alpha3, iata, icao, carriage_class, call_center, flight_id, plane_id, airline_id = None):
+    def __init__(self, airline_name, country, iso31661_alpha2, iso31661_alpha3, iata, icao, carriage_class, call_center, airline_id = None):
         if airline_id:
             self.airline_id = airline_id
         self.airline_name = airline_name
@@ -134,5 +136,3 @@ class Airline(Base, CustomSerializerMixin):
         self.icao = icao
         self.carriage_class = carriage_class
         self.call_center = call_center
-        self.flight_id = flight_id
-        self.plane_id = plane_id
