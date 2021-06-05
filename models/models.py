@@ -63,7 +63,7 @@ class Transplantation(Base, CustomSerializerMixin):
         self.flight_id = flight_id
 
 def flight_id_generator():
-    return ''.join(random.choises(string.ascii_uppercase, k=2)) + ' ' +\
+    return ''.join(random.choices(string.ascii_uppercase, k=2)) + ' ' +\
         ''.join(random.choices(string.digits, k=4))
 
 class Flight(Base, CustomSerializerMixin):
