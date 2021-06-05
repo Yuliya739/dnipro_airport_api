@@ -1,7 +1,4 @@
 from datetime import datetime, timedelta
-from sqlalchemy.sql.functions import current_date
-
-from sqlalchemy.sql.sqltypes import DateTime
 from models.models import Admin, Flight
 from flask import jsonify
 from flask import request
@@ -43,10 +40,25 @@ def auth():
         else:
             return 'Error', 404
 
+def flights_today(is_departure: bool):
+    current_time = datetime.now()
+    final_time = current_time + timedelta(days=1)  ;
+    data = db.session.query(Flight).filter(Flight.estimated_time.between(current_time,final_time), Flight.is_departure == is_departure).all()
+    return jsonify([value.to_dict() for value in data]), 200
+
+@app.route('/arrivals/today', methods=['GET'])
+def arrivals_today():
+    if request.method == 'GET':
+        return flights_today(False)
+
 @app.route('/departures/today', methods=['GET'])
 def departures_today():
     if request.method == 'GET':
-        current_time = datetime.now()
-        final_time = current_time + timedelta(days=1)  ;
-        data = db.session.query(Flight).filter(Flight.estimated_time.between(current_time,final_time), Flight.is_departure == True).all()
-        return jsonify([value.to_dict() for value in data]), 200
+        return flights_today(True)
+
+@app.route('/flight', methods = ['POST'])
+def add_flight():
+    if request.method == 'POST':
+
+
+        return 'Done', 200

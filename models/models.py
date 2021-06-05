@@ -1,5 +1,7 @@
 import uuid
 from sqlalchemy import Column, String, SmallInteger, Boolean, CheckConstraint, ForeignKey, DateTime, Index
+import string    
+import random
 from sqlalchemy.sql.sqltypes import Date, Integer
 from models.custom_serializer import CustomSerializerMixin
 from sqlalchemy.ext.declarative import declarative_base
@@ -64,22 +66,27 @@ class Transplantation(Base, CustomSerializerMixin):
     transplantation_date = Column(DateTime(timezone=True), nullable=False)
     gate = Column(String(), nullable=False)
     company_transfer = Column(String(), nullable=False)
+    flight_id = Column(String(), ForeignKey('flight.flight_id', ondelete='CASCADE'), nullable=False)    
 
-    def __init__(self, transplantation_date, gate, company_transfer, transplantation_id = None):
+    def __init__(self, transplantation_date, gate, company_transfer, flight_id, transplantation_id = None):
         if transplantation_id:
             self.transplantation_id = transplantation_id
         self.transplantation_date = transplantation_date
         self.gate = gate        
-        self.company_transfer = company_transfer  
+        self.company_transfer = company_transfer
+        self.flight_id = flight_id
+
+def flight_id_generator():
+    return ''.join(random.choises(string.ascii_uppercase, k=2)) + ' ' +\
+        ''.join(random.choices(string.digits, k=4))
 
 class Flight(Base, CustomSerializerMixin):
     __tablename__ = 'flight'
 
-    flight_id = Column(String(), nullable=False, primary_key = True, name = 'flight_id',  default=lambda: str(uuid.uuid4()))
+    flight_id = Column(String(), nullable=False, primary_key = True, name = 'flight_id',  default=flight_id_generator())
     estimated_time = Column(DateTime(timezone=True), nullable=False)
     airline_name = Column(String(), nullable=False)
     is_departure = Column(Boolean(), nullable=False, default=True)
-    transplantation_id = Column(String(), ForeignKey('transplantation.transplantation_id', ondelete='CASCADE'), nullable=True)    
     real_time = Column(DateTime(timezone=True), nullable=False)
     terminal = Column(String(), nullable=False)
     gate = Column(String(), nullable=False)
@@ -87,7 +94,7 @@ class Flight(Base, CustomSerializerMixin):
     airport_name = Column(String(), nullable=False)
     direction = Column(String(), nullable=False)
 
-    def __init__(self, is_departure, estimated_time, airline_name, arrival_id, departure_id, transplantation_id,\
+    def __init__(self, is_departure, estimated_time, airline_name, arrival_id, departure_id,\
          direction, arrival_date, terminal, gate, remark, airport_name, flight_id = None):
         if flight_id:
             self.flight_id = flight_id    
@@ -95,7 +102,6 @@ class Flight(Base, CustomSerializerMixin):
         self.airline_name = airline_name
         self.arrival_id = arrival_id        
         self.departure_id = departure_id        
-        self.transplantation_id = transplantation_id
         self.is_departure = is_departure
         self.arrival_date = arrival_date        
         self.terminal = terminal

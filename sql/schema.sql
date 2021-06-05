@@ -26,26 +26,26 @@ CREATE TABLE orders(
   email text NOT NULL
 );
 
-CREATE TABLE transplantation(
-  transplantation_id text PRIMARY KEY NOT NULL,
-  transplantation_date timestamp with time zone NOT NULL,
-  gate text NOT NULL,
-  company_transfer text NOT NULL
-);
-
 CREATE TABLE flight(
   flight_id text PRIMARY KEY NOT NULL,
   estimated_time timestamp with time zone NOT NULL,
   airline_name text NOT NULL,
-  transplantation_id text,
   is_departure boolean DEFAULT TRUE NOT NULL,
   real_time timestamp with time zone NOT NULL,
   terminal text NOT NULL,
   gate text NOT NULL,
   remark text NOT NULL,
   airport_name text NOT NULL,
-  direction text NOT NULL,
-  FOREIGN KEY(transplantation_id) REFERENCES transplantation(transplantation_id) ON DELETE CASCADE
+  direction text NOT NULL
+);
+
+CREATE TABLE transplantation(
+  transplantation_id text PRIMARY KEY NOT NULL,
+  transplantation_date timestamp with time zone NOT NULL,
+  gate text NOT NULL,
+  company_transfer text NOT NULL,
+  flight_id text NOT NULL,
+  FOREIGN KEY(flight_id) REFERENCES flight(flight_id) ON DELETE CASCADE
 );
 
 CREATE TABLE ticket(
