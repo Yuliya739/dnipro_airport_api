@@ -13,7 +13,7 @@ class Plane(Base, CustomSerializerMixin):
 
     plane_id = Column(String(), nullable=False, primary_key = True, name = 'plane_id', default=lambda: str(uuid.uuid4()))
     plane_name = Column(String(), nullable=False)
-    kol_seats = Column(String(), nullable=False)
+    kol_seats = Column(Integer(), nullable=False)
     airline_id = Column(String(), ForeignKey('airline.airline_id'), nullable=False)
 
 
@@ -27,13 +27,13 @@ class Plane(Base, CustomSerializerMixin):
 class Orders(Base, CustomSerializerMixin):
     __tablename__ = 'orders'
 
-    order_id = Column(String(100), nullable=False, primary_key = True, name = 'order_id',  default=lambda: str(uuid.uuid4()))
-    last_name = Column(String(100), nullable=False)
-    first_name = Column(String(100), nullable=False)
+    order_id = Column(String(), nullable=False, primary_key = True, name = 'order_id',  default=lambda: str(uuid.uuid4()))
+    last_name = Column(String(), nullable=False)
+    first_name = Column(String(), nullable=False)
     date_of_birthday = Column(Date(), nullable=False)
     num_passport = Column(Integer(), nullable=False)
     valid_until = Column(Date(), nullable=False)
-    email = Column(String(100), nullable=False) 
+    email = Column(String(), nullable=False) 
 
     def __init__(self, last_name, first_name, date_of_birthday, num_passport, valid_until, email,  order_id = None):
         if order_id:
@@ -81,15 +81,13 @@ class Flight(Base, CustomSerializerMixin):
     airline_id = Column(String(), ForeignKey('airline.airline_id', ondelete='CASCADE'), nullable=False)
 
 
-    def __init__(self, is_departure, estimated_time, arrival_id, departure_id,\
-         direction, arrival_date, terminal, airline_id, gate, remark, airport_name, flight_id = None):
+    def __init__(self, is_departure, estimated_time,\
+         direction, real_time, terminal, airline_id, gate, remark, airport_name, flight_id = None):
         if flight_id:
             self.flight_id = flight_id    
         self.estimated_time = estimated_time
-        self.arrival_id = arrival_id        
-        self.departure_id = departure_id        
         self.is_departure = is_departure
-        self.arrival_date = arrival_date        
+        self.real_time = real_time        
         self.terminal = terminal
         self.gate = gate
         self.remark = remark        
