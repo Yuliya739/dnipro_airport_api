@@ -8,23 +8,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class Admin(Base, CustomSerializerMixin):
-   __tablename__ = 'admin'
-
-   admin_id = Column(String(), primary_key = True, nullable=False, name = 'admin_id', default=lambda: str(uuid.uuid4()))
-   last_name = Column(String(), nullable=False)
-   first_name = Column(String(), nullable=False)  
-   patronymic = Column(String(), nullable=False)
-   password = Column(String(), nullable=False)
-
-   def __init__(self, last_name, first_name, patronymic, password, admin_id = None):     
-        if admin_id: 
-            self.admin_id = admin_id
-        self.last_name = last_name
-        self.first_name = first_name
-        self.patronymic = patronymic
-        self.password = password       
-
 class Plane(Base, CustomSerializerMixin):
     __tablename__ = 'plane'
 
@@ -137,11 +120,10 @@ class Airline(Base, CustomSerializerMixin):
     icao = Column(String(), nullable=False)
     carriage_class = Column(String(), nullable=False)
     call_center = Column(String(), nullable=False)
-    admin_id = Column(String(), ForeignKey('admin.admin_id'), nullable=True)
     flight_id = Column(String(), ForeignKey('flight.flight_id'), nullable=False)
     plane_id = Column(String(), ForeignKey('plane.plane_id', ondelete='CASCADE'), nullable=False)
 
-    def __init__(self, airline_name, country, iso31661_alpha2, iso31661_alpha3, iata, icao, carriage_class, call_center, admin_id, flight_id, plane_id, airline_id = None):
+    def __init__(self, airline_name, country, iso31661_alpha2, iso31661_alpha3, iata, icao, carriage_class, call_center, flight_id, plane_id, airline_id = None):
         if airline_id:
             self.airline_id = airline_id
         self.airline_name = airline_name
@@ -152,6 +134,5 @@ class Airline(Base, CustomSerializerMixin):
         self.icao = icao
         self.carriage_class = carriage_class
         self.call_center = call_center
-        self.admin_id = admin_id
         self.flight_id = flight_id
-        self.admin_id = plane_id
+        self.plane_id = plane_id

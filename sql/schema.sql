@@ -2,12 +2,21 @@ DROP DATABASE IF EXISTS dneprairport;
 CREATE DATABASE dneprairport;
 \c dneprairport
 
-CREATE TABLE admin(
-  admin_id text PRIMARY KEY NOT NULL,
-  last_name text NOT NULL,
-  first_name text NOT NULL,
-  patronymic text NOT NULL,
-  password text NOT NULL
+
+CREATE TABLE airline(
+  airline_id text PRIMARY KEY NOT NULL,
+  airline_name text NOT NULL,
+  country text NOT NULL,
+  iso31661_alpha2 text NOT NULL,
+  iso31661_alpha3 text NOT NULL,
+  iata text NOT NULL,
+  icao text NOT NULL,
+  carriage_class text NOT NULL,
+  call_center text NOT NULL,
+  flight_id text NOT NULL,
+  plane_id text NOT NULL,
+  FOREIGN KEY(flight_id) REFERENCES flight(flight_id),
+  FOREIGN KEY(plane_id) REFERENCES plane(plane_id) ON DELETE CASCADE
 );
 
 CREATE TABLE plane(
@@ -55,22 +64,4 @@ CREATE TABLE ticket(
   flight_id text NOT NULL, 
   FOREIGN KEY(order_id) REFERENCES orders(order_id) ON DELETE CASCADE, 
   FOREIGN KEY(flight_id) REFERENCES flight(flight_id) ON DELETE CASCADE
-);
-
-CREATE TABLE airline(
-  airline_id text PRIMARY KEY NOT NULL,
-  airline_name text NOT NULL,
-  country text NOT NULL,
-  iso31661_alpha2 text NOT NULL,
-  iso31661_alpha3 text NOT NULL,
-  iata text NOT NULL,
-  icao text NOT NULL,
-  carriage_class text NOT NULL,
-  call_center text NOT NULL,
-  admin_id text,
-  flight_id text NOT NULL,
-  plane_id text NOT NULL,
-  FOREIGN KEY(admin_id) REFERENCES admin(admin_id),
-  FOREIGN KEY(flight_id) REFERENCES flight(flight_id),
-  FOREIGN KEY(plane_id) REFERENCES plane(plane_id) ON DELETE CASCADE
 );
