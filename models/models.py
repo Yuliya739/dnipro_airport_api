@@ -1,6 +1,5 @@
 import uuid
 from sqlalchemy import Column, String, Boolean, ForeignKey, DateTime
-import string    
 import random
 from sqlalchemy.sql.sqltypes import Date, Integer
 from models.custom_serializer import CustomSerializerMixin
@@ -76,7 +75,7 @@ class Flight(Base, CustomSerializerMixin):
     flight_id = Column(String(), nullable=False, primary_key = True, name = 'flight_id',  default=flight_id_generator)
     estimated_time = Column(DateTime(timezone=True), nullable=False)
     is_departure = Column(Boolean(), nullable=False, default=True)
-    real_time = Column(DateTime(timezone=True), nullable=False)
+    real_time = Column(DateTime(timezone=True), nullable=True)
     terminal = Column(String(), nullable=False)
     gate = Column(String(), nullable=False)
     remark = Column(String(), nullable=False)

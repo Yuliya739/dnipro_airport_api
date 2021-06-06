@@ -37,7 +37,7 @@ CREATE TABLE flight(
   flight_id text PRIMARY KEY NOT NULL,
   estimated_time timestamp with time zone NOT NULL,
   is_departure boolean DEFAULT TRUE NOT NULL,
-  real_time timestamp with time zone NOT NULL,
+  real_time timestamp with time zone,
   terminal text NOT NULL,
   gate text NOT NULL,
   remark text NOT NULL,
