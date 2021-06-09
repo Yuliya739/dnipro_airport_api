@@ -64,17 +64,18 @@ request body
         "direction": "test", 
         "real_time": "2012-11-01T04:16:18-04:00", 
         "terminal": "D4", 
-        "airline_id": "854e9277-9563-4c5f-8c78-a7db124939de", 
+        "plane_id": "854e9277-9563-4c5f-8c78-a7db124939de", 
         "gate": "3D", 
         "remark": "departs at 12:00", 
-        "airport_name": "Borispol"
+        "airport_name": "Borispol",
+        "travel_time": 180
     }
 
 returns 200
 
 response body
 
-    "Done"
+    flight_id
 
 ### GET /flight
 returns 200

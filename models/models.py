@@ -48,15 +48,15 @@ class Transplantation(Base, CustomSerializerMixin):
     __tablename__ = 'transplantation'
 
     transplantation_id = Column(String(), nullable=False, primary_key = True, name = 'transplantation_id',  default=lambda: str(uuid.uuid4()))
-    transplantation_date = Column(DateTime(timezone=True), nullable=False)
+    transplantation_time = Column(DateTime(timezone=True), nullable=False)
     gate = Column(String(), nullable=False)
     company_transfer = Column(String(), nullable=False)
     flight_id = Column(String(), ForeignKey('flight.flight_id', ondelete='CASCADE'), nullable=False)    
 
-    def __init__(self, transplantation_date, gate, company_transfer, flight_id, transplantation_id = None):
+    def __init__(self, transplantation_time, gate, company_transfer, flight_id, transplantation_id = None):
         if transplantation_id:
             self.transplantation_id = transplantation_id
-        self.transplantation_date = transplantation_date
+        self.transplantation_time = transplantation_time
         self.gate = gate        
         self.company_transfer = company_transfer
         self.flight_id = flight_id
@@ -80,12 +80,15 @@ class Flight(Base, CustomSerializerMixin):
     gate = Column(String(), nullable=False)
     remark = Column(String(), nullable=False)
     airport_name = Column(String(), nullable=False)
-    direction = Column(String(), nullable=False)    
-    airline_id = Column(String(), ForeignKey('airline.airline_id', ondelete='CASCADE'), nullable=False)
+    direction = Column(String(), nullable=False)
+    travel_time = Column(Integer(), nullable=False)
+    plane_id = Column(String(), ForeignKey('plane.plane_id', ondelete='CASCADE'), nullable=False)
+    coast = Column(Integer(), nullable=False)
 
 
     def __init__(self, is_departure, estimated_time,\
-         direction, real_time, terminal, airline_id, gate, remark, airport_name, flight_id = None):
+         direction, terminal, plane_id, gate,\
+             travel_time, remark, airport_name, coast, real_time = None, flight_id = None):
         if flight_id:
             self.flight_id = flight_id    
         self.estimated_time = estimated_time
@@ -96,20 +99,20 @@ class Flight(Base, CustomSerializerMixin):
         self.remark = remark        
         self.airport_name = airport_name
         self.direction = direction  
-        self.airline_id = airline_id 
+        self.plane_id = plane_id 
+        self.travel_time = travel_time 
+        self.coast = coast 
 
-class Tiket(Base, CustomSerializerMixin):
+class Ticket(Base, CustomSerializerMixin):
     __tablename__ = 'ticket'
 
     ticket_id = Column(String(), nullable=False, primary_key = True, name = 'ticket_id', default=lambda: str(uuid.uuid4()))
-    air_ticket_class = Column(String(), nullable=False)
     order_id = Column(String(), ForeignKey('orders.order_id', ondelete='CASCADE'))
     flight_id = Column(String(), ForeignKey('flight.flight_id', ondelete='CASCADE'), nullable=False)
 
-    def __init__(self, air_ticket_class, order_id, flight_id, ticket_id = None):
+    def __init__(self, flight_id, order_id = None, ticket_id = None):
         if ticket_id:
             self.ticket_id = ticket_id
-        self.air_ticket_class = air_ticket_class
         self.order_id = order_id        
         self.flight_id = flight_id
 

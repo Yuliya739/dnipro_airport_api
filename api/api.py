@@ -1,12 +1,16 @@
 from datetime import datetime, timedelta
-from models.models import Airline, Flight
+
+from werkzeug.wrappers import response
+from models.models import Airline, Flight, Plane, Ticket, Transplantation
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from flask import Flask
 from sqlalchemy.sql.schema import MetaData
+from sqlalchemy import func
 from werkzeug.datastructures import Headers
 from flask import request, Response
+import dateutil.parser
 
 # __init__
 engine = create_engine('postgresql+psycopg2://postgres:kaktys33@localhost/dneprairport')
@@ -41,14 +45,14 @@ def before_request():
         return None, 200, cors_headers
 #/__init__
 
-def model_to_json(data):
+def models_to_list_json(data):
     return jsonify([value.to_dict() for value in data])
 
 def flights_today(is_departure: bool):
     current_time = datetime.now()
-    final_time = current_time + timedelta(days=1)  ;
+    final_time = current_time + timedelta(days=1)
     data = db.session.query(Flight).filter(Flight.estimated_time.between(current_time,final_time), Flight.is_departure == is_departure).all()
-    return model_to_json(data), 200, {'Content-Type': 'application/json'}
+    return models_to_list_json(data), 200, {'Content-Type': 'application/json'}
 
 @app.route('/arrival/today', methods=['GET'])
 def arrivals_today():
@@ -65,20 +69,50 @@ def add_flight():
     if request.method == 'POST':
         body = request.get_json(True)
         flight = Flight(body['is_departure'], body['estimated_time'], body['direction'],\
-            body['real_time'], body['terminal'], body['airline_id'], body['gate'], body['remark'],\
-                body['airport_name'])
+            body['terminal'], body['plane_id'], body['gate'],\
+                 body['travel_time'], body['remark'],\
+                body['airport_name'], body['coast'], body.get('real_time'))
         db.session.add(flight)
+        ticket_count = db.session.query(Plane).filter(Plane.plane_id == body['plane_id']).first().kol_seats
+        for i in range(ticket_count):
+            db.session.add(Ticket(flight.flight_id))
         db.session.commit()
-        return 'Done', 200
+        return flight.flight_id, 200
     if request.method == 'GET':
         data = db.session.query(Flight).all()
-        return model_to_json(data), 200
+        return models_to_list_json(data), 200
+
+@app.route('/trans', methods=['POST', 'GET'])
+def add_trans():
+    if request.method == 'POST':
+        parser = request.get_json(True)
+        time = parser['time']
+        gate = parser['gate']
+        transfer = parser['company_transfer']
+        flight_id = parser['flight_id']
+        trans = Transplantation(time, gate, transfer, flight_id)
+        db.session.add(trans)
+        db.session.commit()
+        return trans.transplantation_id, 200
+    if request.method == 'GET':
+        id = request.args.get('flight_id')
+        trans = db.session.query(Transplantation).filter(Transplantation.flight_id == id).first()
+        if trans:
+            return jsonify(trans.to_dict()), 200
+        else:
+            return 'Not found', 201
 
 @app.route('/airline', methods=['GET', 'POST'])
 def airline():
     if request.method == 'GET':
-        data = db.session.query(Airline).all()
-        return model_to_json(data), 200
+        plane_id = request.args.get('plane_id')
+        if plane_id:
+            plane = db.session.query(Plane).filter(Plane.plane_id == plane_id).first()
+            airline = db.session.query(Airline).filter(Airline.airline_id == plane.airline_id).first()
+            return jsonify(airline.to_dict()), 200
+        else:
+            data = db.session.query(Airline).all()
+            return models_to_list_json(data), 200
     if request.method == 'POST':
         body = request.get_json(True)
         airline = Airline(body['airline_name'], body['country'], body['iso31661_alpha2'],\
@@ -86,4 +120,40 @@ def airline():
                 body['carriage_class'], body['call_center'])
         db.session.add(airline)
         db.session.commit()
-        return 'Done', 200
+        return airline.airline_id, 200
+
+@app.route('/flight/search', methods=['GET'])
+def search_flight():
+    date = dateutil.parser.parse(request.args.get('date'))
+    start = date.date();
+    end = start + timedelta(days=1)
+    destination = request.args.get('destination')
+    data =  db.session.query(Flight).\
+            filter(func.lower(Flight.direction).contains(func.lower(destination))).\
+            filter(Flight.estimated_time.between(start, end)).\
+            filter(Flight.is_departure == True)
+    # data = db.session.query(Flight).outerjoin(Transplantation,  Flight.flight_id == Transplantation.flight_id).\
+    #     filter(Flight.direction.contains(destination)).\
+    #     filter(Flight.estimated_time.between(start, end))
+
+    return models_to_list_json(data), 200
+
+@app.route('/plane', methods=['GET', 'POST'])
+def plane():
+    if request.method == 'GET':
+        airline_id = request.args.get('airline_id')
+        data = db.session.query(Plane).filter(Plane.airline_id == airline_id).all()
+        return models_to_list_json(data), 200
+    if request.method == 'POST':
+        body = request.get_json(True)
+        plane = Plane(body['plane_name'], body['kol_seats'], body['airline_id'])
+        db.session.add(plane)
+        db.session.commit()
+        return plane.plane_id, 200
+
+@app.route('/ticket', methods=['GET'])
+def ticket():
+    if request.method == 'GET':
+        flight_id = request.args.get('flight_id')
+        data = db.session.query(Ticket).filter(Ticket.flight_id == flight_id).all()
+        return models_to_list_json(data), 200

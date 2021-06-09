@@ -38,18 +38,20 @@ CREATE TABLE flight(
   estimated_time timestamp with time zone NOT NULL,
   is_departure boolean DEFAULT TRUE NOT NULL,
   real_time timestamp with time zone,
+  travel_time bigint NOT NULL,
   terminal text NOT NULL,
   gate text NOT NULL,
   remark text NOT NULL,
   airport_name text NOT NULL,
   direction text NOT NULL,
-  airline_id text NOT NULL,
-  FOREIGN KEY(airline_id) REFERENCES airline(airline_id) ON DELETE CASCADE
+  plane_id text NOT NULL,
+  coast int NOT NULL,
+  FOREIGN KEY(plane_id) REFERENCES plane(plane_id) ON DELETE CASCADE
 );
 
 CREATE TABLE transplantation(
   transplantation_id text PRIMARY KEY NOT NULL,
-  transplantation_date timestamp with time zone NOT NULL,
+  transplantation_time timestamp with time zone NOT NULL,
   gate text NOT NULL,
   company_transfer text NOT NULL,
   flight_id text NOT NULL,
@@ -58,7 +60,6 @@ CREATE TABLE transplantation(
 
 CREATE TABLE ticket(
   ticket_id text PRIMARY KEY NOT NULL,
-  air_ticket_class text NOT NULL,
   order_id text,
   flight_id text NOT NULL, 
   FOREIGN KEY(order_id) REFERENCES orders(order_id) ON DELETE CASCADE, 
