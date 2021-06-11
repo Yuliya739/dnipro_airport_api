@@ -1,7 +1,5 @@
 from datetime import datetime, timedelta
-
-from werkzeug.wrappers import response
-from models.models import Airline, Flight, Plane, Ticket, Transplantation
+from models.models import Airline, Flight, Orders, Plane, Ticket, Transplantation
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
@@ -157,3 +155,19 @@ def ticket():
         flight_id = request.args.get('flight_id')
         data = db.session.query(Ticket).filter(Ticket.flight_id == flight_id).all()
         return models_to_list_json(data), 200
+
+@app.route('/orders', methods=['POST'])
+def orders():
+    if request.method == 'POST':
+        body = request.get_json(True)
+        print(body)
+        order = Orders(body['last_name'], body['first_name'], body['date_of_birthday'], body['num_passport'], body['valid_until'], body['email'])
+        db.session.add(order)
+        flight_id = body.get('flight_id')
+        ticket = db.session.query(Ticket).filter(Ticket.order_id == None).filter(Ticket.flight_id == flight_id).first()
+        ticket.order_id = order.order_id
+        db.session.merge(ticket)
+        db.session.commit()
+        return order.order_id, 200
+    else:
+        return 'Error', 444
