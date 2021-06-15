@@ -159,9 +159,9 @@ def ticket():
 @app.route('/orders', methods=['POST'])
 def orders():
     if request.method == 'POST':
-        body = request.get_json(True)
-        print(body)
-        order = Orders(body['last_name'], body['first_name'], body['date_of_birthday'], body['num_passport'], body['valid_until'], body['email'])
+        body = request.form
+        order = Orders(body['last_name'], body['first_name'], body['date_of_birthday'],\
+             body['num_passport'], body['valid_until'], body['email'])
         db.session.add(order)
         flight_id = body.get('flight_id')
         ticket = db.session.query(Ticket).filter(Ticket.order_id == None).filter(Ticket.flight_id == flight_id).first()
@@ -169,5 +169,3 @@ def orders():
         db.session.merge(ticket)
         db.session.commit()
         return order.order_id, 200
-    else:
-        return 'Error', 444
