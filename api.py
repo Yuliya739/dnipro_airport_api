@@ -65,7 +65,7 @@ def departures_today():
 @app.route('/flight', methods = ['POST', 'GET'])
 def add_flight():
     if request.method == 'POST':
-        body = request.get_json(True)
+        body = request.form
         flight = Flight(body['is_departure'], body['estimated_time'], body['direction'],\
             body['terminal'], body['plane_id'], body['gate'],\
                  body['travel_time'], body['remark'],\
@@ -83,7 +83,7 @@ def add_flight():
 @app.route('/trans', methods=['POST', 'GET'])
 def add_trans():
     if request.method == 'POST':
-        parser = request.get_json(True)
+        parser = request.form
         time = parser['time']
         gate = parser['gate']
         transfer = parser['company_transfer']
@@ -112,7 +112,7 @@ def airline():
             data = db.session.query(Airline).all()
             return models_to_list_json(data), 200
     if request.method == 'POST':
-        body = request.get_json(True)
+        body = request.form
         airline = Airline(body['airline_name'], body['country'], body['iso31661_alpha2'],\
             body['iso31661_alpha3'], body['iata'], body['icao'],\
                 body['carriage_class'], body['call_center'])
@@ -143,7 +143,7 @@ def plane():
         data = db.session.query(Plane).filter(Plane.airline_id == airline_id).all()
         return models_to_list_json(data), 200
     if request.method == 'POST':
-        body = request.get_json(True)
+        body = request.form
         plane = Plane(body['plane_name'], body['kol_seats'], body['airline_id'])
         db.session.add(plane)
         db.session.commit()
