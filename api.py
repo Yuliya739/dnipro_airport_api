@@ -66,7 +66,7 @@ def departures_today():
 def add_flight():
     if request.method == 'POST':
         body = request.form
-        flight = Flight(body['is_departure'], body['estimated_time'], body['direction'],\
+        flight = Flight(body['is_departure'] == 'true', body['estimated_time'], body['direction'],\
             body['terminal'], body['plane_id'], body['gate'],\
                  body['travel_time'], body['remark'],\
                 body['airport_name'], body['coast'], body.get('real_time'))
@@ -140,8 +140,12 @@ def search_flight():
 def plane():
     if request.method == 'GET':
         airline_id = request.args.get('airline_id')
-        data = db.session.query(Plane).filter(Plane.airline_id == airline_id).all()
-        return models_to_list_json(data), 200
+        if airline_id:
+            data = db.session.query(Plane).filter(Plane.airline_id == airline_id).all()
+            return models_to_list_json(data), 200
+        else:
+            data = db.session.query(Plane).all()
+            return models_to_list_json(data), 200
     if request.method == 'POST':
         body = request.form
         plane = Plane(body['plane_name'], body['kol_seats'], body['airline_id'])
